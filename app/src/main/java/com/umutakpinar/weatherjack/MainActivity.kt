@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -21,7 +20,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,14 +28,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.umutakpinar.weatherjack.ui.theme.WeatherJackTheme
-import com.umutakpinar.weatherjack.view.MainScreen
-import com.umutakpinar.weatherjack.viewmodel.ScaffoldViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.DEFAULT_CONCURRENCY
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -45,12 +39,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WeatherJackTheme {
-                val navController = rememberNavController()
-                val isTopBarBackButtonVisible = remember { mutableStateOf<Boolean>(false) }
+                val navController = rememberNavController() //navigate edebilmemiz için gerekli
+                //val isTopBarBackButtonVisible = remember { mutableStateOf<Boolean>(false) }
                 val scaffoldState = rememberScaffoldState()
-                val scope = rememberCoroutineScope()
-                val viewModel: ScaffoldViewModel = hiltViewModel()
+                val scope = rememberCoroutineScope() ////ilk yolu kullanacağımız için burası böyle viewmodel'ler içerisindeki functionları suspend yapacağız
 
+
+                /*
+                val viewModel: MainActivityViewModel = hiltViewModel()
                 //Drawera aç kapa yaptırmak
                 LaunchedEffect(key1 = Unit){
                     delay(600)
@@ -59,80 +55,38 @@ class MainActivity : ComponentActivity() {
                         viewModel.toggleDrawer(scaffoldState)
                     }
                 }
+                */
 
+                //Her şeyi kaplayan surface burası
+                //Şu linkteki gibi bir şey tasarlayalım.
+                //https://stackoverflow.com/questions/66828175/what-is-scaffold-jetpack-compose
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
+
                     Scaffold(
-                        topBar = {
-                            CustomTopAppBar(navController,LocalContext.current,scaffoldState,isTopBarBackButtonVisible,scope,viewModel) },
-                        modifier = Modifier.shadow(35.dp, RectangleShape), //Pek bi etkisi olmadi sanki
-                        scaffoldState = scaffoldState,
-                        drawerContent = {
-                            //TODO DRAWER İÇİNDE favorilere eklenmiş konumlar bulunacak!
-                        },
+                        modifier = Modifier.fillMaxSize()
                     ) {
+
                         Column(
-                            modifier = Modifier
-                                .padding(paddingValues = it)
-                                .padding(10.dp)
+                            modifier = Modifier.padding(paddingValues = it
+                            )
                         ) {
-                            NavHost(navController = navController, startDestination = "main_screen"){
-                                composable("main_screen"){
-                                    MainScreen(navController = navController, isTopBarBackButtonVisible)
-                                }
-                            }
+
                         }
+
                     }
+
+
                 }
+
+
             }
         }
     }
 }
 
-
-@Composable
-fun CustomTopAppBar(
-    navHostController: NavHostController,
-    context: Context,
-    scaffoldState: ScaffoldState,
-    isBackButtonVisible : MutableState<Boolean>,
-    scope : CoroutineScope,
-    viewModel: ScaffoldViewModel
-    ){
-    TopAppBar(
-    ){
-        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
-            IconButton(
-                modifier = Modifier.alpha(if(isBackButtonVisible.value) 1.0f else 0f),
-                onClick = {
-                    if(isBackButtonVisible.value){ //Yani yalnizca görünür ise tiklanilabilir olsun
-                        Toast.makeText(context,"Back Button Clicked",Toast.LENGTH_SHORT).show()
-                    }
-                }
-            ) {
-                Icon(imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back Button")
-            }
-            Text(
-                text = "WeatherJack!",
-                textAlign = TextAlign.Center,
-                fontSize = 24.sp,
-                fontFamily = FontFamily.Monospace,
-                modifier = Modifier.align(CenterVertically)
-            )
-            IconButton(onClick = {
-                /* TODO Burada tiklaninca appDrawer açmali */
-                    scope.launch {
-                        viewModel.toggleDrawer(scaffoldState)
-                    }
-            }) {
-                Icon(imageVector = Icons.Filled.Menu , contentDescription = "Menu Drawer Button")
-            }
-        }
-    }
-}
 
 
 
