@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
                                     }
 
                                     composable("search_location_screen"){
-                                        SearchLocationScreen()
+                                        SearchLocationScreen(navController)
                                     }
 
                                     composable("settings_screen"){
