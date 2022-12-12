@@ -18,12 +18,19 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.umutakpinar.weatherjack.ui.theme.WeatherJackTheme
+import com.umutakpinar.weatherjack.view.DetailedLocationScreen
+import com.umutakpinar.weatherjack.view.FavoriteLocationScreen
+import com.umutakpinar.weatherjack.view.SearchLocationScreen
+import com.umutakpinar.weatherjack.view.SettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -41,6 +48,7 @@ class MainActivity : ComponentActivity() {
                 //Her şeyi kaplayan surface burası
                 //Şu linkteki gibi bir şey tasarlayalım.
                 //https://stackoverflow.com/questions/66828175/what-is-scaffold-jetpack-compose
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
@@ -50,7 +58,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         scaffoldState = scaffoldState,
                         topBar = {
-                            JackTopBar(showBackButton = showBackButton)
+                            JackTopBar(navController = navController,showBackButton = showBackButton)
                         },
                         bottomBar = {
                                     JackBottomBar(scaffoldState = scaffoldState, scope = scope)
@@ -61,7 +69,7 @@ class MainActivity : ComponentActivity() {
                         floatingActionButtonPosition = FabPosition.Center,
                         isFloatingActionButtonDocked = true,
                         floatingActionButton = {
-                            JackFloatingActionButton()
+                            JackFloatingActionButton(navController)
                         }
                     ) {
 
@@ -73,13 +81,32 @@ class MainActivity : ComponentActivity() {
                             //Çağıracağın composable screenler eğer viewmodele erişirken kendi scope'larını kullanamıyorsa bu durumda parametre olarak her birine yuakrıda oluşturmuş olduğum scope'u verebilirsin.
 
                             //Test area
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                                Button(onClick = {
-                                    showBackButton.value = !showBackButton.value
-                                }) {
-                                    Text(
-                                        text = "Change showBackButton"
-                                    )
+                            Box(modifier = Modifier.fillMaxSize()){
+
+                                NavHost(navController = navController, startDestination = "favorite_locations_screen"){
+
+                                    //herhangi bir yere navigate edildiğinde ya da bir navigatio args değiştiğinde çalışır!
+                                    val navigationStateChanged = navController.addOnDestinationChangedListener { _, _, _ ->
+                                        showBackButton.value = navController.currentDestination!!.route != "favorite_locations_screen"
+                                    }
+
+                                    composable("favorite_locations_screen"){ //Burada parametre alam direkt room'dan çek favorileri
+                                        FavoriteLocationScreen()
+                                    }
+
+                                    composable("detailed_location_screen"){
+                                        DetailedLocationScreen()
+                                    }
+
+                                    composable("search_location_screen"){
+                                        SearchLocationScreen()
+                                    }
+
+                                    composable("settings_screen"){
+                                        SettingsScreen()
+                                    }
+
+
                                 }
                             }
 
@@ -96,7 +123,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun JackTopBar(showBackButton : MutableState<Boolean>){
+    fun JackTopBar(navController: NavController,showBackButton : MutableState<Boolean>){
         TopAppBar(
             title = {
                Box(modifier = Modifier.fillMaxSize()){
@@ -110,7 +137,9 @@ class MainActivity : ComponentActivity() {
                     //Topbar back button, eğer parametre doğruysa göster
                    if(showBackButton.value){
                        IconButton(
-                           onClick = { /*TODO*/ },
+                           onClick = {
+                                     navController.navigateUp()
+                           },
                            modifier = Modifier.align(Alignment.CenterEnd)
                        ) {
                            Icon(imageVector = Icons.Sharp.ArrowBack, contentDescription = "Back Button" )
@@ -140,8 +169,12 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun JackFloatingActionButton(){
-        ExtendedFloatingActionButton(onClick = { /*TODO*/ }, text = {
+    fun JackFloatingActionButton(navController : NavController){
+        ExtendedFloatingActionButton(onClick = {
+            if(navController.currentDestination!!.route.toString() != "search_location_screen"){
+                navController.navigate("search_location_screen")
+            }
+        }, text = {
             Icon(imageVector = Icons.Sharp.Search, contentDescription = "Search Weather Button")
         })
     }
