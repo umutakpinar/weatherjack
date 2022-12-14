@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity() {
                 //Her şeyi kaplayan surface burası
                 //Şu linkteki gibi bir şey tasarlayalım.
                 //https://stackoverflow.com/questions/66828175/what-is-scaffold-jetpack-compose
-
+                val context = LocalContext
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
@@ -99,7 +100,7 @@ class MainActivity : ComponentActivity() {
                                     }
 
                                     composable("search_location_screen"){
-                                        SearchLocationScreen(navController)
+                                        SearchLocationScreen(context.current,navController)
                                     }
 
                                     composable("settings_screen"){

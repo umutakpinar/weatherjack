@@ -8,7 +8,7 @@ interface LocationAPI {
     //example url for istanbul
     //https://geocoding-api.open-meteo.com/v1/search?name=istanbul
     @GET("search")
-    fun getLocationData(
+    suspend fun getLocationData(
         @Query("name") searchText : String
     ) : Location
 }

@@ -15,7 +15,7 @@ class LocationRepository @Inject constructor(
         val response = try{
             api.getLocationData(searchText)
         }catch (e : Exception){
-            return Resource.Error(message = "Something gone wrong...\nIf you are a developer look at this : "+e.message)
+            return Resource.Error(message = "Error!")
         }
         return Resource.Succes(response)
     }

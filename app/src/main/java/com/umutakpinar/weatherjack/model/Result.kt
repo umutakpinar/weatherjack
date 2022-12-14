@@ -1,20 +1,34 @@
 package com.umutakpinar.weatherjack.model
 
+import com.google.gson.annotations.SerializedName
+
 data class Result(
-    val admin1: String,
-    val admin1_id: Int,
-    val admin2: String,
-    val admin2_id: Int,
-    val country: String,
-    val country_code: String,
-    val country_id: Int,
-    val elevation: Double,
-    val feature_code: String,
-    val id: Int,
-    val latitude: Double,
-    val longitude: Double,
-    val name: String,
-    val population: Int,
-    val postcodes: List<String>,
-    val timezone: String
+    @SerializedName("id")
+    var id: Int? = null,
+    @SerializedName("name")
+    var name: String? = null,
+    @SerializedName("latitude")
+    var latitude: Double? = null,
+    @SerializedName("longitude")
+    var longitude: Double? = null,
+    @SerializedName("elevation")
+    var elevation: Int? = null,
+    @SerializedName("feature_code")
+    var featureCode: String? = null,
+    @SerializedName("country_code")
+    var countryCode: String? = null,
+    @SerializedName("admin1_id")
+    var admin1Id: Int? = null,
+    @SerializedName("timezone")
+    var timezone: String? = null,
+    @SerializedName("population")
+    var population: Int? = null,
+    @SerializedName("postcodes")
+    var postcodes   : ArrayList<String> = arrayListOf(),
+    @SerializedName("country_id")
+    var countryId: Int? = null,
+    @SerializedName("country")
+    var country: String? = null,
+    @SerializedName("admin1")
+    var admin1: String? = null
 )
